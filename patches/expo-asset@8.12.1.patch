@@ -1,0 +1,24 @@
+diff --git a/tools/hashAssetFiles.js b/tools/hashAssetFiles.js
+index c118dcf1efc32b509f83df314e15de2a8ea9e1b0..c88088736a79b00645ca85d04bb9a4d936e4af47 100644
+--- a/tools/hashAssetFiles.js
++++ b/tools/hashAssetFiles.js
+@@ -15,6 +15,19 @@ module.exports = function hashAssetFiles(asset) {
+         .replace(/\.\.\//g, '_');
+     }
+ 
++    // URL encode asset paths defined as `?export_path` or `?unstable_path` query parameters.
++    // Decoding should be done automatically when parsing the URL through Node or the browser.
++    const assetPathQueryParameter = asset.httpServerLocation.match(
++      /\?(export_path|unstable_path)=(.*)/
++    );
++    if (assetPathQueryParameter && assetPathQueryParameter[2]) {
++      const assetPath = assetPathQueryParameter[2];
++      asset.httpServerLocation = asset.httpServerLocation.replace(
++        assetPath,
++        encodeURIComponent(assetPath)
++      );
++    }
++
+     return asset;
+   });
+ };
